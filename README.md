@@ -313,7 +313,7 @@ docker run --gpus all --ipc=host -p 8000:8000 lmsysorg/sglang:hy4 \
 
 ## Finetuning
 
-Hy4 provides a complete model finetuning pipeline. For detailed documentation, please refer to: [Finetuning Guide](./finetune/README.md)
+Hy4 provides a complete model finetuning pipeline. For detailed documentation, please refer to: [Finetuning Guide](./finetune/README.md).
 
 ## System Card
 
