@@ -60,7 +60,7 @@
 
 **Hy4** is a new-generation Mixture-of-Experts (MoE) flagship model developed by the Tencent Hy Team, supporting text, image, and video understanding. The language backbone comprises 770B total parameters, of which 49B are activated per token. It consists of 78 layers, with a standard dense FFN in the first layer and MoE FFNs in the remaining 77 layers. Each MoE layer contains 256 routed experts and 1 shared expert; every token activates the top-8 routed experts along with the shared expert. In addition to the backbone, a 5-layer DFly2 drafter (3.3B parameters) is built in for speculative decoding.
 
-On the architecture side, inspired by DeepSeek and GLM, the attention module employs Gated [DeepSeek Sparse Attention](https://arxiv.org/abs/2512.02556) (Gated DSA) with [IndexCache](https://arxiv.org/abs/2603.12201) for cross-layer sparse index reuse. The residual pathway uses [iHC (identity Hyper-Connections)](https://zhuanlan.zhihu.com/p/2010852389670908320) to expand inter-layer information flow. A ViT supports dynamic image resolutions, with an adapter converting image and video frame features into visual tokens for the language model to process alongside text tokens. [DFly2](#dfly2-for-speculative-decoding), a parallel drafter, reuses Hy4's KV cache and sparse indices, enabling long-context drafting at a low, constant cost without a separate KV cache.
+On the architecture side, inspired by DeepSeek and GLM, the attention module employs Gated [DeepSeek Sparse Attention](https://arxiv.org/abs/2512.02556) (Gated DSA) with [IndexCache](https://arxiv.org/abs/2603.12201) for cross-layer sparse index reuse. The residual pathway uses [iHC (identity Hyper-Connections)](https://zhuanlan.zhihu.com/p/2010852389670908320) to expand inter-layer information flow. A ViT supports dynamic image resolutions, with an adapter converting image and video frame features into visual tokens for the language model to process alongside text tokens. [DFly2](#dfly2-for-speculative-decoding), a parallel drafter, reuses Hy4's KV cache and sparse indices to support long-context speculative decoding at a low, constant cost.
 
 ### Model Specifications
 
@@ -255,7 +255,7 @@ DFly2 is Hy4's speculative-decoding drafter, trained with [AngelSpec](https://gi
 - **PD-disaggregation ready**: not involved in prefill; the prefill-to-decode transfer adds only one last-layer hidden state.
 
 <p align="center">
-  <a href="assets/dfly2.png"><img src="assets/dfly2.png" alt="DFly2 architecture: each draft layer reuses the KV cache and indexer-selected top-k positions of a Hy4 DSA layer" width="40%"/></a>
+  <a href="assets/dfly2.png"><img src="assets/dfly2.png" alt="DFly2 architecture: each draft layer reuses the KV cache and indexer-selected top-k positions of a Hy4 DSA layer" width="75%"/></a>
 </p>
 
 ### Quantization
@@ -268,7 +268,7 @@ For this model, we have provided a [GGUF](https://huggingface.co/AngelSlim/Hy4-G
 
 For production serving, we recommend using [vLLM](https://github.com/vllm-project/vllm) or [SGLang](https://docs.sglang.io/). Please refer to the recipes:
 - [Hy4 vLLM Recipe](https://recipes.vllm.ai/tencent/Hy4)
-- [Hy4 SGLang Cookbook](https://lmsysorg.mintlify.app/cookbook/autoregressive/Tencent/Hy4)
+- [Hy4 SGLang Cookbook](https://docs.sglang.io/cookbook/autoregressive/Tencent/Hy4)
 
 #### vLLM
 
@@ -304,11 +304,10 @@ docker run --gpus all --ipc=host -p 8000:8000 lmsysorg/sglang:hy4 \
   sglang serve \
     --model-path tencent/Hy4-FP8 \
     --tp 8 \
-    --cuda-graph-backend-prefill disabled \
     --speculative-algorithm DFLY \
-    --speculative-dfly-block-size 6 \
     --port 8000 \
     --served-model-name hy4
+
 ```
 
 ## Finetuning
@@ -317,7 +316,7 @@ Hy4 provides a complete model finetuning pipeline. For detailed documentation, p
 
 ## System Card
 
-Please refer to the [Hy4 System Card](https://tencent.ai/transparency-center).
+Please refer to the [Hy4 System Card](https://hy.tencent.ai/legal/Hy4_system_card.pdf).
 
 ## License
 

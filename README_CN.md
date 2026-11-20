@@ -60,7 +60,7 @@
 
 **Hy4** 是由腾讯混元团队研发的新一代混合专家（MoE）旗舰模型，支持文本、图像和视频理解。语言模型主干总参数量 770B，每个 token 激活 49B，共包含 78 层，第一层采用标准 FFN，其余 77 层均为 MoE 结构，每层包含 256 个路由专家与 1 个共享专家，每个 token 激活 top-8 路由专家及共享专家。主干之外内置 5 层 DFly2 草稿模型（参数量 3.3B）以支持投机解码。
 
-在架构层面，受到 DeepSeek 和 GLM 的启发，注意力侧采用 Gated [DeepSeek Sparse Attention](https://arxiv.org/abs/2512.02556)（Gated DSA），并引入 [IndexCache](https://arxiv.org/abs/2603.12201) 跨层复用稀疏索引，残差侧采用 [iHC (identity Hyper-Connections)](https://zhuanlan.zhihu.com/p/2010852389670908320) 扩展层间信息通路。视觉侧采用支持动态分辨率的 ViT，通过适配器将图像和视频帧的特征转换为视觉 token，与文本 token 一同输入语言模型。并行草稿模型 [DFly2](#dfly2-投机解码) 直接复用 Hy4 的 KV cache 与稀疏索引，以固定的低开销支持长上下文推理，且无需独立的 KV cache。
+在架构层面，受到 DeepSeek 和 GLM 的启发，注意力侧采用 Gated [DeepSeek Sparse Attention](https://arxiv.org/abs/2512.02556)（Gated DSA），并引入 [IndexCache](https://arxiv.org/abs/2603.12201) 跨层复用稀疏索引，残差侧采用 [iHC (identity Hyper-Connections)](https://zhuanlan.zhihu.com/p/2010852389670908320) 扩展层间信息通路。视觉侧采用支持动态分辨率的 ViT，通过适配器将图像和视频帧的特征转换为视觉 token，与文本 token 一同输入语言模型。并行草稿模型 [DFly2](#dfly2-投机解码) 直接复用 Hy4 的 KV cache 与稀疏索引，以固定的低开销支持长上下文投机解码。
 
 ### 模型规格
 
@@ -248,12 +248,12 @@ print(response.choices[0].message.content)
 
 DFly2 是基于 [AngelSpec](https://github.com/Tencent/AngelSpec) 框架训练的 Hy4 投机解码草稿模型，直接复用主模型的 **Top-k Sparse KV**：每个 draft 层与 Hy4 对应的 DSA 层共享 KV cache（**KV Share**）及 indexer 选出的 top-2048 个位置（**Index Share**）。由此带来三点优势：
 
-- **计算开销固定**：无论上下文多长，每个草稿 token 最多只关注约 2K 个 key。
+- **计算开销固定**：每个草稿 token 至多关注约 2K 个 key，注意力复杂度与上下文长度无关。
 - **零额外 KV 显存**：无需维护草稿模型独立的 KV cache。
 - **适配 PD 分离**：不参与 prefill，P→D 仅额外传输一个末层隐状态。
 
 <p align="center">
-  <a href="assets/dfly2.png"><img src="assets/dfly2.png" alt="DFly2 结构图：每个 draft 层复用 Hy4 对应 DSA 层的 KV cache 与 indexer 选出的 top-k 位置" width="40%"/></a>
+  <a href="assets/dfly2.png"><img src="assets/dfly2.png" alt="DFly2 结构图：每个 draft 层复用 Hy4 对应 DSA 层的 KV cache 与 indexer 选出的 top-k 位置" width="75%"/></a>
 </p>
 
 ### 量化工具
@@ -266,7 +266,7 @@ DFly2 是基于 [AngelSpec](https://github.com/Tencent/AngelSpec) 框架训练�
 
 对于生产环境部署，我们建议使用 [vLLM](https://github.com/vllm-project/vllm) 或 [SGLang](https://docs.sglang.io/)。请参考部署方案：
 - [Hy4 vLLM Recipe](https://recipes.vllm.ai/tencent/Hy4)
-- [Hy4 SGLang Cookbook](https://lmsysorg.mintlify.app/cookbook/autoregressive/Tencent/Hy4)
+- [Hy4 SGLang Cookbook](https://docs.sglang.io/cookbook/autoregressive/Tencent/Hy4)
 
 
 #### vLLM
@@ -303,20 +303,19 @@ docker run --gpus all --ipc=host -p 8000:8000 lmsysorg/sglang:hy4 \
   sglang serve \
     --model-path tencent/Hy4-FP8 \
     --tp 8 \
-    --cuda-graph-backend-prefill disabled \
     --speculative-algorithm DFLY \
-    --speculative-dfly-block-size 6 \
     --port 8000 \
     --served-model-name hy4
 ```
 
+
 ## 模型微调
 
-Hy4 提供了完整的模型微调流程，详细的微调文档请参考：[模型微调指南](./finetune/README_CN.md)
+Hy4 提供了完整的模型微调流程，详细的微调文档请参考：[模型微调指南](./finetune/README_CN.md)。
 
 ## System Card
 
-请参阅 [Hy4 System Card](https://tencent.ai/transparency-center)。
+请参阅 [Hy4 System Card](https://hy.tencent.ai/legal/Hy4_system_card.pdf)。
 
 ## 许可证
 
