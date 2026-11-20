@@ -315,7 +315,7 @@ Hy4 提供了完整的模型微调流程，详细的微调文档请参考：[模
 
 ## System Card
 
-请参阅 [Hy4 System Card](https://hy.tencent.ai/legal/Hy4_system_card.pdf)。
+请参阅 [Hy4 System Card](https://hy.tencent.ai/Hy4_system_card.pdf)。
 
 ## 许可证
 

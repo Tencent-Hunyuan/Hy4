@@ -316,7 +316,7 @@ Hy4 provides a complete model finetuning pipeline. For detailed documentation, p
 
 ## System Card
 
-Please refer to the [Hy4 System Card](https://hy.tencent.ai/legal/Hy4_system_card.pdf).
+Please refer to the [Hy4 System Card](https://hy.tencent.ai/Hy4_system_card.pdf).
 
 ## License
 
