@@ -16,7 +16,7 @@
 &nbsp;&nbsp;
 [![ModelScope](https://img.shields.io/badge/ModelScope-Tencent%20Hy-624aff)](https://modelscope.cn/models/Tencent-Hunyuan/Hy4)
 &nbsp;&nbsp;
-[![GitCode](https://img.shields.io/badge/GitCode-Tencent%20Hy-red?logoColor=white)](https://ai.gitcode.com/tencent_hunyuan/Hy4)
+[![AtomGit](https://img.shields.io/badge/AtomGit-Tencent%20Hy-red?logoColor=white)](https://ai.gitcode.com/tencent_hunyuan/Hy4)
 
 </div>
 
@@ -58,7 +58,7 @@
 
 ## 模型介绍
 
-**Hy4** 是由腾讯混元团队研发的新一代混合专家（MoE）旗舰模型，支持文本、图像和视频理解。语言模型主干总参数量 770B，每个 token 激活 49B，共包含 78 层，第一层采用标准 FFN，其余 77 层均为 MoE 结构，每层包含 256 个路由专家与 1 个共享专家，每个 token 激活 top-8 路由专家及共享专家。主干之外内置 5 层 DFly2 草稿模型（参数量 3.3B）以支持投机解码。
+**Hy4** 是由腾讯混元团队研发的新一代混合专家（MoE）旗舰模型，支持文本和图像理解。语言模型主干总参数量 770B，每个 token 激活 49B，共包含 78 层，第一层采用标准 FFN，其余 77 层均为 MoE 结构，每层包含 256 个路由专家与 1 个共享专家，每个 token 激活 top-8 路由专家及共享专家。主干之外内置 5 层 DFly2 草稿模型（参数量 3.3B）以支持投机解码。
 
 在架构层面，受到 DeepSeek 和 GLM 的启发，注意力侧采用 Gated [DeepSeek Sparse Attention](https://arxiv.org/abs/2512.02556)（Gated DSA），并引入 [IndexCache](https://arxiv.org/abs/2603.12201) 跨层复用稀疏索引，残差侧采用 [iHC (identity Hyper-Connections)](https://zhuanlan.zhihu.com/p/2010852389670908320) 扩展层间信息通路。视觉侧采用支持动态分辨率的 ViT，通过适配器将图像和视频帧的特征转换为视觉 token，与文本 token 一同输入语言模型。并行草稿模型 [DFly2](#dfly2-投机解码) 直接复用 Hy4 的 KV cache 与稀疏索引，以固定的低开销支持长上下文投机解码。
 
@@ -204,11 +204,11 @@ Hy4 将复杂推理、科学编程与长程任务执行相结合，进一步提�
 
 ## 新闻
 
-* 我们在 [Hugging Face](https://huggingface.co/tencent/Hy4)、[ModelScope](https://modelscope.cn/models/Tencent-Hunyuan/Hy4) 和 [GitCode](https://ai.gitcode.com/tencent_hunyuan/Hy4) 开源 **Hy4**、**Hy4-FP8** 和预训练模型 **Hy4 base** 的权重。
+* 我们在 [Hugging Face](https://huggingface.co/tencent/Hy4)、[ModelScope](https://modelscope.cn/models/Tencent-Hunyuan/Hy4) 和 [AtomGit](https://ai.gitcode.com/tencent_hunyuan/Hy4) 开源 **Hy4**、**Hy4-FP8** 和预训练模型 **Hy4 base** 的权重。
 
 ## 模型链接
 
-| 模型名 | 简介 | Hugging Face | ModelScope | GitCode |
+| 模型名 | 简介 | Hugging Face | ModelScope | AtomGit |
 |:---|:---|:---:|:---:|:---:|
 | Hy4 | Instruct 模型 | [Model](https://huggingface.co/tencent/Hy4) | [Model](https://modelscope.cn/models/Tencent-Hunyuan/Hy4) | [Model](https://ai.gitcode.com/tencent_hunyuan/Hy4) |
 | Hy4-FP8 | FP8 量化 Instruct 模型 | [Model](https://huggingface.co/tencent/Hy4-FP8) | [Model](https://modelscope.cn/models/Tencent-Hunyuan/Hy4-FP8) | [Model](https://ai.gitcode.com/tencent_hunyuan/Hy4-FP8) |
